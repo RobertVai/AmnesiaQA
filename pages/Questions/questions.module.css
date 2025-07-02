@@ -1,12 +1,17 @@
-.container {
+.page {
+  display: flex;
+}
+
+.main {
+  margin-left: 200px;
   padding: 2rem;
+  flex: 1;
   color: white;
 }
 
 .heading {
   font-size: 2rem;
   margin-bottom: 1.5rem;
-  text-align: center;
 }
 
 .list {
