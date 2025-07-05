@@ -1,17 +1,10 @@
 import { useState } from 'react'
+import Link from 'next/link'
 import Sidebar from '@/components/Sidebar'
+import { isUserAuthenticated } from '@/utils/auth'
 import styles from './questions.module.css'
 
-interface Question {
-  id: string
-  userName: string
-  questionText: string
-  date: string
-  likes: number
-  liked: boolean // добавляем статус: пользователь лайкнул или нет
-}
-
-const initialQuestions: Question[] = [
+const initialQuestions = [
   {
     id: '1',
     userName: 'Alice',
@@ -53,6 +46,12 @@ export default function QuestionsPage() {
 
       <main className={styles.main}>
         <h1 className={styles.heading}>All Questions</h1>
+
+        {isUserAuthenticated() && (
+          <div className={styles.askWrapper}>
+            <Link href="/Ask" className={styles.askBtn}>+ Ask Question</Link>
+          </div>
+        )}
 
         <div className={styles.list}>
           {questions.map((q) => (

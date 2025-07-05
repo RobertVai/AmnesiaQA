@@ -9,7 +9,7 @@ export default function Home() {
 
       <div className={styles.buttons}>
         <Link href="/Register" className={styles.btn}>Register</Link>
-        <Link href="/login" className={styles.btn}>Sign In</Link>
+        <Link href="/Login" className={styles.btn}>Sign In</Link>
         <Link href="/Questions" className={styles.btn}>Explore</Link>
       </div>
     </div>
