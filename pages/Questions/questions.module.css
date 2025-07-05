@@ -60,3 +60,29 @@
 .liked {
   color: #00ccff;
 }
+
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.askWrapper {
+  margin-bottom: 2rem;
+}
+
+.askBtn {
+  background-color: #00ccff;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  color: black;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.askBtn:hover {
+  background-color: #00aacc;
+}
+
