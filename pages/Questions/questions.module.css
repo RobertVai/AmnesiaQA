@@ -42,3 +42,21 @@
   font-size: 0.9rem;
   color: #aaa;
 }
+
+.likeBtn {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.2s;
+  margin-right: 0.3rem;
+}
+
+.likeBtn:hover {
+  color: #fff;
+}
+
+.liked {
+  color: #00ccff;
+}
