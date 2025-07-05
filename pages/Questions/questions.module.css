@@ -21,14 +21,17 @@
 }
 
 .card {
-  background-color: #1a1a1a;
+  background-color: #1e1e1e;
   padding: 1rem;
-  border-radius: 8px;
-  transition: background 0.3s;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  margin-bottom: 1.2rem;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .card:hover {
-  background-color: #222;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
 }
 
 .question {
@@ -37,24 +40,24 @@
 }
 
 .meta {
+  font-size: 0.8rem;
+  color: #aaa;
   display: flex;
   justify-content: space-between;
-  font-size: 0.9rem;
-  color: #aaa;
+  margin-top: 0.5rem;
 }
 
 .likeBtn {
   background: none;
   border: none;
-  font-size: 1rem;
-  color: #888;
   cursor: pointer;
+  color: #aaa;
+  font-size: 1.1rem;
   transition: color 0.2s;
-  margin-right: 0.3rem;
 }
 
 .likeBtn:hover {
-  color: #fff;
+  color: #00ccff;
 }
 
 .liked {

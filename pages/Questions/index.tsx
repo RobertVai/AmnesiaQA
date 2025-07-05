@@ -1,7 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Sidebar from '@/components/Sidebar'
-import { isUserAuthenticated } from '@/utils/auth'
 import styles from './questions.module.css'
 
 const initialQuestions = [
@@ -25,6 +24,20 @@ const initialQuestions = [
 
 export default function QuestionsPage() {
   const [questions, setQuestions] = useState(initialQuestions)
+  const [isAuth, setIsAuth] = useState(false)
+
+useEffect(() => {
+  if (typeof window !== 'undefined') {
+    setIsAuth(localStorage.getItem('isAuth') === 'true')
+
+    const saved = localStorage.getItem('newQuestion')
+    if (saved) {
+      const parsed = JSON.parse(saved)
+      setQuestions((prev) => [parsed, ...prev])
+      localStorage.removeItem('newQuestion')
+    }
+  }
+}, [])
 
   const toggleLike = (id: string) => {
     setQuestions((prev) =>
@@ -47,7 +60,7 @@ export default function QuestionsPage() {
       <main className={styles.main}>
         <h1 className={styles.heading}>All Questions</h1>
 
-        {isUserAuthenticated() && (
+        {isAuth && (
           <div className={styles.askWrapper}>
             <Link href="/Ask" className={styles.askBtn}>+ Ask Question</Link>
           </div>
