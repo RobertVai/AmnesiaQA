@@ -3,7 +3,16 @@ import Link from 'next/link'
 import Sidebar from '@/components/Sidebar'
 import styles from './questions.module.css'
 
-const initialQuestions = [
+interface Question {
+  id: string
+  userName: string
+  questionText: string
+  date: string
+  likes: number
+  liked: boolean
+}
+
+const initialQuestions: Question[] = [
   {
     id: '1',
     userName: 'Alice',
@@ -23,21 +32,21 @@ const initialQuestions = [
 ]
 
 export default function QuestionsPage() {
-  const [questions, setQuestions] = useState(initialQuestions)
+  const [questions, setQuestions] = useState<Question[]>(initialQuestions)
   const [isAuth, setIsAuth] = useState(false)
 
-useEffect(() => {
-  if (typeof window !== 'undefined') {
-    setIsAuth(localStorage.getItem('isAuth') === 'true')
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsAuth(localStorage.getItem('isAuth') === 'true')
 
-    const saved = localStorage.getItem('newQuestion')
-    if (saved) {
-      const parsed = JSON.parse(saved)
-      setQuestions((prev) => [parsed, ...prev])
-      localStorage.removeItem('newQuestion')
+      const saved = localStorage.getItem('newQuestion')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        setQuestions((prev) => [parsed, ...prev])
+        localStorage.removeItem('newQuestion')
+      }
     }
-  }
-}, [])
+  }, [])
 
   const toggleLike = (id: string) => {
     setQuestions((prev) =>
@@ -53,6 +62,13 @@ useEffect(() => {
     )
   }
 
+  const handleDelete = (id: string) => {
+    const confirmDelete = confirm('Are you sure you want to delete this question?')
+    if (!confirmDelete) return
+
+    setQuestions((prev) => prev.filter((q) => q.id !== id))
+  }
+
   return (
     <div className={styles.page}>
       <Sidebar />
@@ -62,7 +78,7 @@ useEffect(() => {
 
         {isAuth && (
           <div className={styles.askWrapper}>
-            <Link href="/Ask" className={styles.askBtn}>+ Ask Question</Link>
+            <Link href="/ask" className={styles.askBtn}>+ Ask Question</Link>
           </div>
         )}
 
@@ -77,12 +93,19 @@ useEffect(() => {
                   <button
                     onClick={() => toggleLike(q.id)}
                     className={`${styles.likeBtn} ${q.liked ? styles.liked : ''}`}
-                    aria-label="Like button"
                   >
-                    👍
+                    💙
                   </button>
                   {q.likes}
                 </span>
+                {isAuth && (
+                  <button
+                    onClick={() => handleDelete(q.id)}
+                    className={styles.deleteBtn}
+                  >
+                    🗑️ Delete
+                  </button>
+                )}
               </div>
             </div>
           ))}
