@@ -1,23 +1,43 @@
 .page {
   display: flex;
+  background-color: #121212;
+  color: white;
+  min-height: 100vh;
 }
 
 .main {
-  margin-left: 200px;
+  margin-left: 220px; 
   padding: 2rem;
-  flex: 1;
-  color: white;
+  width: calc(100% - 220px);
 }
 
 .heading {
   font-size: 2rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  color: #00ccff;
+}
+
+.askWrapper {
+  margin-bottom: 2rem;
+}
+
+.askBtn {
+  background-color: #00ccff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  color: black;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.askBtn:hover {
+  background-color: #00aacc;
 }
 
 .list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 }
 
 .card {
@@ -35,7 +55,7 @@
 }
 
 .question {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   margin-bottom: 0.5rem;
 }
 
@@ -44,7 +64,9 @@
   color: #aaa;
   display: flex;
   justify-content: space-between;
-  margin-top: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .likeBtn {
@@ -64,28 +86,15 @@
   color: #00ccff;
 }
 
-.topBar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
+.deleteBtn {
+  background: none;
+  border: none;
+  color: #ff5555;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: color 0.2s;
 }
 
-.askWrapper {
-  margin-bottom: 2rem;
+.deleteBtn:hover {
+  color: red;
 }
-
-.askBtn {
-  background-color: #00ccff;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  color: black;
-  font-weight: bold;
-  text-decoration: none;
-  transition: background-color 0.3s;
-}
-
-.askBtn:hover {
-  background-color: #00aacc;
-}
-
