@@ -8,7 +8,7 @@ export default function Home() {
       <p className={styles.slogan}>Memory fades. Answers stay.</p>
 
       <div className={styles.buttons}>
-        <Link href="/register" className={styles.btn}>Register</Link>
+        <Link href="/Register" className={styles.btn}>Register</Link>
         <Link href="/login" className={styles.btn}>Sign In</Link>
         <Link href="/Questions" className={styles.btn}>Explore</Link>
       </div>
