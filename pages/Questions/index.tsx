@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Sidebar from '@/components/Sidebar'
 import styles from './questions.module.css'
 import { isUserAuthenticated } from '@/utils/auth'
+import api from '@/utils/api'
 
 interface Answer {
   id: string
@@ -22,31 +23,8 @@ interface Question {
   showAnswers: boolean
 }
 
-const initialQuestions: Question[] = [
-  {
-    id: '1',
-    userName: 'Alice',
-    questionText: 'How does useEffect work in React?',
-    date: '2025-07-01',
-    likes: 0,
-    liked: false,
-    answers: [],
-    showAnswers: false
-  },
-  {
-    id: '2',
-    userName: 'Bob',
-    questionText: 'What is the difference between == and === in JS?',
-    date: '2025-07-02',
-    likes: 0,
-    liked: false,
-    answers: [],
-    showAnswers: false
-  },
-]
-
 export default function QuestionsPage() {
-  const [questions, setQuestions] = useState<Question[]>(initialQuestions)
+  const [questions, setQuestions] = useState<Question[]>([])
   const [isAuth, setIsAuth] = useState(false)
   const [answerInputs, setAnswerInputs] = useState<{ [key: string]: string }>({})
 
@@ -60,8 +38,30 @@ export default function QuestionsPage() {
         setQuestions((prev) => [parsed, ...prev])
         localStorage.removeItem('newQuestion')
       }
+
+      fetchQuestionsFromBackend()
     }
   }, [])
+
+  const fetchQuestionsFromBackend = async () => {
+    try {
+      const res = await api.get('/questions')
+      const data = res.data.map((q: any) => ({
+        id: q._id,
+        userName: q.userName || 'Anonymous',
+        questionText: q.question_text,
+        date: new Date(q.date).toLocaleDateString(),
+        likes: 0,
+        liked: false,
+        answers: [],
+        showAnswers: false,
+      }))
+      setQuestions((prev) => [...data, ...prev])
+      console.log('Fetched from backend:', data)
+    } catch (err: any) {
+      console.error('Backend fetch error:', err.message)
+    }
+  }
 
   const toggleLike = (id: string) => {
     setQuestions((prev) =>
