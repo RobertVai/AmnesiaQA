@@ -30,19 +30,25 @@ export default function AskPage() {
   })
 
   const onSubmit = async (data: FormData) => {
-    const newQuestion = {
-      id: Date.now().toString(),
-      questionText: data.questionText,
-      userName: 'You',
-      date: new Date().toISOString().split('T')[0],
-      likes: 0,
-      liked: false,
+    try {
+      const res = await fetch('http://localhost:5000/api/question', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          questionText: data.questionText,
+        }),
+      })
+
+      if (!res.ok) {
+        throw new Error('Failed to post question')
+      }
+
+      router.push('/Questions')
+    } catch (err) {
+      console.error('Submit error:', err)
     }
-
-    
-    localStorage.setItem('newQuestion', JSON.stringify(newQuestion))
-
-    router.push('/Questions')
   }
 
   return (
