@@ -1,19 +1,19 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import Sidebar from '@/components/Sidebar'
 import styles from './questions.module.css'
 import { isUserAuthenticated } from '@/utils/auth'
-import api from '@/utils/api'
 
 interface Answer {
-  id: string
+  _id: string
   text: string
-  date: string
   user: string
+  date: string
 }
 
 interface Question {
-  id: string
+  _id: string
   userName: string
   questionText: string
   date: string
@@ -27,89 +27,96 @@ export default function QuestionsPage() {
   const [questions, setQuestions] = useState<Question[]>([])
   const [isAuth, setIsAuth] = useState(false)
   const [answerInputs, setAnswerInputs] = useState<{ [key: string]: string }>({})
+  const router = useRouter()
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setIsAuth(isUserAuthenticated())
-
-      const saved = localStorage.getItem('newQuestion')
-      if (saved) {
-        const parsed = JSON.parse(saved)
-        setQuestions((prev) => [parsed, ...prev])
-        localStorage.removeItem('newQuestion')
-      }
-
-      fetchQuestionsFromBackend()
+    if (!isUserAuthenticated()) {
+      router.push('/Register')
+    } else {
+      setIsAuth(true)
+      fetchQuestions()
     }
   }, [])
 
-  const fetchQuestionsFromBackend = async () => {
+  const fetchQuestions = async () => {
     try {
-      const res = await api.get('/questions')
-      const data = res.data.map((q: any) => ({
-        id: q._id,
-        userName: q.userName || 'Anonymous',
-        questionText: q.question_text,
-        date: new Date(q.date).toLocaleDateString(),
-        likes: 0,
+      const res = await fetch('http://localhost:5000/api/questions')
+      const data = await res.json()
+      const formatted = data.map((q: any) => ({
+        ...q,
         liked: false,
-        answers: [],
         showAnswers: false,
       }))
-      setQuestions((prev) => [...data, ...prev])
-      console.log('Fetched from backend:', data)
-    } catch (err: any) {
-      console.error('Backend fetch error:', err.message)
+      setQuestions(formatted)
+    } catch (err) {
+      console.error('Error fetching questions', err)
     }
   }
 
-  const toggleLike = (id: string) => {
-    setQuestions((prev) =>
-      prev.map((q) =>
-        q.id === id
-          ? {
-              ...q,
-              liked: !q.liked,
-              likes: q.liked ? q.likes - 1 : q.likes + 1,
-            }
-          : q
-      )
-    )
+  const toggleLike = async (id: string) => {
+    setQuestions(prev => prev.map(q => q._id === id ? {
+      ...q,
+      liked: !q.liked,
+      likes: q.liked ? q.likes - 1 : q.likes + 1
+    } : q))
   }
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     const confirmDelete = confirm('Are you sure you want to delete this question?')
     if (!confirmDelete) return
 
-    setQuestions((prev) => prev.filter((q) => q.id !== id))
+    try {
+      await fetch(`http://localhost:5000/api/question/${id}`, { method: 'DELETE' })
+      setQuestions(prev => prev.filter(q => q._id !== id))
+    } catch (err) {
+      console.error('Delete error', err)
+    }
   }
 
-  const toggleAnswers = (id: string) => {
-    setQuestions((prev) =>
-      prev.map((q) => (q.id === id ? { ...q, showAnswers: !q.showAnswers } : q))
-    )
+  const toggleAnswers = async (id: string) => {
+    const updated = [...questions]
+    const q = updated.find(q => q._id === id)
+    if (q) {
+      if (!q.answers.length) {
+        try {
+          const res = await fetch(`http://localhost:5000/api/question/${id}/answers`)
+          const data = await res.json()
+          q.answers = data
+        } catch (err) {
+          console.error('Answers load error', err)
+        }
+      }
+      q.showAnswers = !q.showAnswers
+      setQuestions([...updated])
+    }
   }
 
   const handleAnswerChange = (id: string, value: string) => {
     setAnswerInputs({ ...answerInputs, [id]: value })
   }
 
-  const submitAnswer = (id: string) => {
-    if (!answerInputs[id] || answerInputs[id].trim().length === 0) return
+  const submitAnswer = async (id: string) => {
+    const answer = answerInputs[id]
+    if (!answer || answer.trim() === '') return
 
-    const newAnswer: Answer = {
-      id: Date.now().toString(),
-      text: answerInputs[id],
-      user: 'You',
-      date: new Date().toLocaleDateString(),
+    try {
+      const res = await fetch(`http://localhost:5000/api/question/${id}/answers`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text: answer })
+      })
+      const newAnswer = await res.json()
+
+      setQuestions(prev => prev.map(q => q._id === id ? {
+        ...q,
+        answers: [...q.answers, newAnswer]
+      } : q))
+      setAnswerInputs(prev => ({ ...prev, [id]: '' }))
+    } catch (err) {
+      console.error('Answer submit error', err)
     }
-
-    setQuestions((prev) =>
-      prev.map((q) =>
-        q.id === id ? { ...q, answers: [...q.answers, newAnswer] } : q
-      )
-    )
-    setAnswerInputs((prev) => ({ ...prev, [id]: '' }))
   }
 
   return (
@@ -119,28 +126,27 @@ export default function QuestionsPage() {
         <h1 className={styles.heading}>All Questions</h1>
         {isAuth && (
           <div className={styles.askWrapper}>
-            <Link href="/ask" className={styles.askBtn}>+ Ask Question</Link>
+            <Link href="/Ask" className={styles.askBtn}>+ Ask Question</Link>
           </div>
         )}
-
         <div className={styles.list}>
-          {questions.map((q) => (
-            <div key={q.id} className={styles.card}>
+          {questions.map(q => (
+            <div key={q._id} className={styles.card}>
               <p className={styles.question}>{q.questionText}</p>
               <div className={styles.meta}>
                 <span>{q.userName}</span>
                 <span>{q.date}</span>
                 <span>
-                  <button onClick={() => toggleLike(q.id)} className={`${styles.likeBtn} ${q.liked ? styles.liked : ''}`}>
+                  <button onClick={() => toggleLike(q._id)} className={`${styles.likeBtn} ${q.liked ? styles.liked : ''}`}>
                     👍
                   </button> {q.likes}
                 </span>
                 {isAuth && (
-                  <button onClick={() => handleDelete(q.id)} className={styles.deleteBtn}>
+                  <button onClick={() => handleDelete(q._id)} className={styles.deleteBtn}>
                     🗑️ Delete
                   </button>
                 )}
-                <button onClick={() => toggleAnswers(q.id)} className={styles.toggleBtn}>
+                <button onClick={() => toggleAnswers(q._id)} className={styles.toggleBtn}>
                   {q.showAnswers ? 'Hide' : 'Show'} Answers ({q.answers.length})
                 </button>
               </div>
@@ -148,7 +154,7 @@ export default function QuestionsPage() {
               {q.showAnswers && (
                 <div className={styles.answersBlock}>
                   {q.answers.map((a) => (
-                    <div key={a.id} className={styles.answer}>
+                    <div key={a._id} className={styles.answer}>
                       <p>{a.text}</p>
                       <span>{a.user} • {a.date}</span>
                     </div>
@@ -158,12 +164,12 @@ export default function QuestionsPage() {
                     <div className={styles.form}>
                       <textarea
                         placeholder="Write your answer..."
-                        value={answerInputs[q.id] || ''}
-                        onChange={(e) => handleAnswerChange(q.id, e.target.value)}
+                        value={answerInputs[q._id] || ''}
+                        onChange={(e) => handleAnswerChange(q._id, e.target.value)}
                         rows={3}
                         className={styles.input}
                       />
-                      <button onClick={() => submitAnswer(q.id)} className={styles.btn}>Submit</button>
+                      <button onClick={() => submitAnswer(q._id)} className={styles.btn}>Submit</button>
                     </div>
                   )}
                 </div>
