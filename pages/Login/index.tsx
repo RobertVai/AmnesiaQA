@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/router'
+import axios from 'axios'
 import styles from '../Register/register.module.css'
 
 const schema = z.object({
@@ -22,14 +23,25 @@ export default function LoginPage() {
     resolver: zodResolver(schema),
   })
 
-  const onSubmit = (data: FormData) => {
-    console.log('LOGIN DATA:', data)
+  const onSubmit = async (data: FormData) => {
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/api/auth/login',
+        data,
+        {
+          withCredentials: true, 
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
 
-    
-    localStorage.setItem('isAuth', 'true')
-
-   
-    router.push('/Questions')
+      console.log('LOGIN SUCCESS:', response.data)
+      router.push('/Questions')
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || 'Login failed'
+      alert(msg)
+    }
   }
 
   return (
