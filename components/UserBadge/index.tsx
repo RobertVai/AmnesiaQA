@@ -9,8 +9,8 @@ export default function UserBadge() {
     <div className={styles.badge}>
       {user ? (
         <>
-          <span className={styles.name}>{user.name}</span>
-          <span className={styles.email}>{user.email}</span>
+          <div className={styles.name}>{user.name}</div>
+          <div className={styles.email}>{user.email}</div>
         </>
       ) : (
         <Link href="/login" className={styles.anon}>
