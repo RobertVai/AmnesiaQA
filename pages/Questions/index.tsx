@@ -342,4 +342,4 @@ return (
     </main>
   </div>
 )
-}
+};
