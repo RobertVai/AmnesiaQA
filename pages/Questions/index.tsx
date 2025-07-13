@@ -5,6 +5,7 @@ import Sidebar from '@/components/Sidebar'
 import styles from './questions.module.css'
 import { isUserAuthenticated } from '@/utils/auth'
 import { useUser } from '@/contexts/UserContext'
+import dayjs from 'dayjs'
 
 interface Answer {
   _id: string
@@ -40,6 +41,7 @@ export default function QuestionsPage() {
   const [questions, setQuestions] = useState<Question[]>([])
   const [isAuth, setIsAuth] = useState(false)
   const [answerInputs, setAnswerInputs] = useState<{ [key: string]: string }>({})
+  const [filter, setFilter] = useState<'all' | 'answered' | 'unanswered'>('all')
   const router = useRouter()
   const { user } = useUser()
 
@@ -236,6 +238,11 @@ return (
     <Sidebar />
     <main className={styles.main}>
       <h1 className={styles.heading}>All Questions</h1>
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+  <button onClick={() => setFilter('all')}>All</button>
+  <button onClick={() => setFilter('answered')}>Answered</button>
+  <button onClick={() => setFilter('unanswered')}>Unanswered</button>
+</div>
 
       {isAuth && (
         <div className={styles.askWrapper}>
@@ -250,7 +257,7 @@ return (
 
             <div className={styles.meta}>
               <span>{q.userName}</span>
-              <span>{q.date}</span>
+              <span>{dayjs(q.date).format('YYYY-MM-DD HH:mm')}</span>
 
               <span>
                 <button
@@ -289,7 +296,7 @@ return (
                 {q.answers.map(a => (
                   <div key={a._id} className={styles.answer}>
                     <p>{a.text}</p>
-                    <span>{a.user_name} • {a.date}</span>
+                    <span>{a.user_name} • {dayjs(a.date).format('YYYY-MM-DD HH:mm')}</span>
 
                     <div className={styles.meta}>
                       <button
