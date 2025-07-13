@@ -32,8 +32,17 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     refreshUser()
   }, [])
 
+  const logout = () => {
+  fetch('http://localhost:5000/api/auth/logout', {
+    method: 'POST',
+    credentials: 'include',
+  })
+    .then(() => setUser(null))
+    .catch(err => console.error('Logout failed', err));
+};
+
   return (
-    <UserContext.Provider value={{ user, setUser, refreshUser }}>
+    <UserContext.Provider value={{ user, setUser, refreshUser, logout }}>
       {children}
     </UserContext.Provider>
   )
