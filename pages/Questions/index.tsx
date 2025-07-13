@@ -40,7 +40,9 @@ export default function QuestionsPage() {
 
   const fetchQuestions = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/questions')
+      const res = await fetch('http://localhost:5000/api/questions', {
+        credentials: 'include'
+      })
       const data = await res.json()
       const formatted = data.map((q: any) => ({
         ...q,
@@ -66,7 +68,10 @@ export default function QuestionsPage() {
     if (!confirmDelete) return
 
     try {
-      await fetch(`http://localhost:5000/api/question/${id}`, { method: 'DELETE' })
+      await fetch(`http://localhost:5000/api/question/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
       setQuestions(prev => prev.filter(q => q._id !== id))
     } catch (err) {
       console.error('Delete error', err)
@@ -79,7 +84,9 @@ export default function QuestionsPage() {
     if (q) {
       if (!q.answers.length) {
         try {
-          const res = await fetch(`http://localhost:5000/api/question/${id}/answers`)
+          const res = await fetch(`http://localhost:5000/api/question/${id}/answers`, {
+            credentials: 'include'
+          })
           const data = await res.json()
           q.answers = data
         } catch (err) {
@@ -105,6 +112,7 @@ export default function QuestionsPage() {
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({ text: answer })
       })
       const newAnswer = await res.json()
