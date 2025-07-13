@@ -237,22 +237,36 @@ return (
   <div className={styles.page}>
     <Sidebar />
     <main className={styles.main}>
-      <h1 className={styles.heading}>All Questions</h1>
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-  <button onClick={() => setFilter('all')}>All</button>
-  <button onClick={() => setFilter('answered')}>Answered</button>
-  <button onClick={() => setFilter('unanswered')}>Unanswered</button>
-</div>
+      <h1 className={styles.heading}>What’s on your mind?</h1>
+      <p className={styles.subheading}>Browse questions or ask your own</p>
 
       {isAuth && (
         <div className={styles.askWrapper}>
           <Link href="/Ask" className={styles.askBtn}>+ Ask Question</Link>
         </div>
       )}
-
+    <div className={styles.filterWrapper}>
+  <label htmlFor="filter" className={styles.filterLabel}>Filter:</label>
+  <select
+    id="filter"
+    value={filter}
+    onChange={e => setFilter(e.target.value as 'all' | 'answered' | 'unanswered')}
+    className={styles.select}
+  >
+    <option value="all">All</option>
+    <option value="answered">Answered</option>
+    <option value="unanswered">Unanswered</option>
+  </select>
+</div>
       <div className={styles.list}>
-        {user && questions.map(q => (
-          <div key={q._id} className={styles.card}>
+        {user && questions
+    .filter(q => {
+      if (filter === 'answered') return q.answers.length > 0
+      if (filter === 'unanswered') return q.answers.length === 0
+      return true
+    })
+    .map(q => (
+      <div key={q._id} className={styles.card}>
             <p className={styles.question}>{q.questionText}</p>
 
             <div className={styles.meta}>

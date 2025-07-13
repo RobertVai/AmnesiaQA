@@ -15,6 +15,14 @@
   font-size: 2rem;
   margin-bottom: 1.5rem;
   color: #00ccff;
+  
+}
+
+.subheading {
+  font-size: 1rem;
+  color: #aaa;
+  margin-top: -1rem;
+  margin-bottom: 2rem;
 }
 
 .askWrapper {
@@ -175,3 +183,33 @@
 .btn:hover {
   background-color: #00aacc;
 }
+
+.filterWrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.filterLabel {
+  color: #ccc;
+  font-size: 0.95rem;
+}
+
+.select {
+  background-color: #1e1e1e;
+  color: #00ccff;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.select:hover,
+.select:focus {
+  border-color: #00ccff;
+}
+
