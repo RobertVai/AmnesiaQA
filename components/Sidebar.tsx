@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import styles from './Sidebar.module.css'
+import LogOut from './LogOut'
 
 export default function Sidebar() {
   return (
@@ -11,8 +12,8 @@ export default function Sidebar() {
         <Link href="#" className={styles.link}>Settings</Link>
       </nav>
 
-      <div className={styles.footer}>
-        <Link href="#" className={styles.link}>Log out</Link>
+      <div className={styles.logoutArea}>
+        <LogOut />
       </div>
     </aside>
   )
