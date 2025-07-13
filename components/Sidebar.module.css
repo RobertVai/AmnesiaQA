@@ -15,8 +15,10 @@
 .logo {
   font-size: 1.3rem;
   font-weight: bold;
-  color: #00ccff;
+  color: #eff0f0;
   margin-bottom: 2rem;
+  text-shadow: 0 0 10px rgb(194, 5, 21), 0 0 20px rgb(207, 5, 5);
+  animation: neonPulse 2s infinite alternate;
 }
 
 .nav {
@@ -39,4 +41,13 @@
 .logoutArea {
   margin-top: auto;
   padding-top: 2rem;
+}
+
+@keyframes neonPulse {
+  from {
+    text-shadow: 0 0 5px  #00ccff, 0 0 10px  #00ccff;
+  }
+  to {
+    text-shadow: 0 0 20px  #00ccff, 0 0 40px  #00ccff;
+  }
 }
