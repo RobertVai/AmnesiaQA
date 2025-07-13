@@ -29,28 +29,29 @@ export default function AskPage() {
     resolver: zodResolver(schema),
   })
 
-  const onSubmit = async (data: FormData) => {
-    try {
-      const res = await fetch('http://localhost:5000/api/question', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', 
-        body: JSON.stringify({
-          question_text: data.questionText, 
-        }),
-      })
+const onSubmit = async (data: FormData) => {
+  try {
+    const res = await fetch('http://localhost:5000/api/question', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', 
+      body: JSON.stringify({
+        questionText: data.questionText, 
+      }),
+    })
 
-      if (!res.ok) {
-        throw new Error('Failed to post question')
-      }
-
-      router.push('/Questions')
-    } catch (err) {
-      console.error('Submit error:', err)
+    if (!res.ok) {
+      const text = await res.text()
+      throw new Error('Failed to post question')
     }
+
+    router.push('/Questions')
+  } catch (err) {
+    console.error('Submit error:', err)
   }
+}
 
   return (
     <div className={styles.container}>
