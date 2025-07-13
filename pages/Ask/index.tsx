@@ -36,22 +36,22 @@ const onSubmit = async (data: FormData) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include', 
+      credentials: 'include',
       body: JSON.stringify({
         questionText: data.questionText, 
       }),
-    })
+    });
 
     if (!res.ok) {
-      const text = await res.text()
-      throw new Error('Failed to post question')
+      const text = await res.text();
+      throw new Error(text || 'Failed to post question');
     }
 
-    router.push('/Questions')
+    router.push('/Questions');
   } catch (err) {
-    console.error('Submit error:', err)
+    console.error('❌ Submit error:', err);
   }
-}
+};
 
   return (
     <div className={styles.container}>
