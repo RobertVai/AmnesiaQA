@@ -38,30 +38,49 @@ export default function QuestionsPage() {
     }
   }, [])
 
-  const fetchQuestions = async () => {
-    try {
-      const res = await fetch('http://localhost:5000/api/questions', {
-        credentials: 'include'
-      })
-      const data = await res.json()
-      const formatted = data.map((q: any) => ({
-        ...q,
-        liked: false,
-        showAnswers: false,
-      }))
-      setQuestions(formatted)
-    } catch (err) {
-      console.error('Error fetching questions', err)
-    }
+const fetchQuestions = async () => {
+  try {
+    const res = await fetch('http://localhost:5000/api/questions', {
+      credentials: 'include'
+    })
+    const data = await res.json()
+    
+const formatted = data.map((q: any) => ({
+  ...q,
+  liked: false,
+  showAnswers: false,
+  likes: typeof q.likes === 'number' ? q.likes : 0,
+  answers: Array.isArray(q.answers) ? q.answers : [], 
+}))
+    
+    setQuestions(formatted)
+  } catch (err) {
+    console.error('Error fetching questions', err)
   }
+}
 
-  const toggleLike = async (id: string) => {
-    setQuestions(prev => prev.map(q => q._id === id ? {
-      ...q,
-      liked: !q.liked,
-      likes: q.liked ? q.likes - 1 : q.likes + 1
-    } : q))
+const toggleLike = async (id: string) => {
+  setQuestions(prev =>
+    prev.map(q =>
+      q._id === id
+        ? {
+            ...q,
+            liked: !q.liked,
+            likes: q.liked ? q.likes - 1 : q.likes + 1,
+          }
+        : q
+    )
+  )
+
+  try {
+    await fetch(`http://localhost:5000/api/question/${id}/like`, {
+      method: 'POST',
+      credentials: 'include',
+    })
+  } catch (err) {
+    console.error('Error toggling like', err)
   }
+}
 
   const handleDelete = async (id: string) => {
     const confirmDelete = confirm('Are you sure you want to delete this question?')
@@ -145,9 +164,12 @@ export default function QuestionsPage() {
                 <span>{q.userName}</span>
                 <span>{q.date}</span>
                 <span>
-                  <button onClick={() => toggleLike(q._id)} className={`${styles.likeBtn} ${q.liked ? styles.liked : ''}`}>
-                    👍
-                  </button> {q.likes}
+                <button
+  onClick={() => toggleLike(q._id)}
+  className={`${styles.likeBtn} ${q.liked ? styles.liked : ''}`}
+>
+  {q.liked ? '👎 Dislike' : '👍 Like'} {q.likes}
+</button>
                 </span>
                 {isAuth && (
                   <button onClick={() => handleDelete(q._id)} className={styles.deleteBtn}>

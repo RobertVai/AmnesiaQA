@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/router'
 import axios from 'axios'
 import styles from './register.module.css'
+import { useUser } from '@/contexts/UserContext'
 
 const schema = z.object({
   name: z.string().min(2, 'Name is too short'),
@@ -15,6 +16,7 @@ type FormData = z.infer<typeof schema>
 
 export default function RegisterPage() {
   const router = useRouter()
+  const { refreshUser } = useUser() 
 
   const {
     register,
@@ -32,6 +34,7 @@ export default function RegisterPage() {
       })
 
       if (res.status === 201) {
+        await refreshUser()
         router.push('/Questions')
       }
     } catch (err: any) {

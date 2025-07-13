@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/router'
 import axios from 'axios'
 import styles from '../Register/register.module.css'
+import { useUser } from '@/contexts/UserContext'
 
 const schema = z.object({
   email: z.string().email('Invalid email'),
@@ -14,6 +15,7 @@ type FormData = z.infer<typeof schema>
 
 export default function LoginPage() {
   const router = useRouter()
+  const { refreshUser } = useUser() 
 
   const {
     register,
@@ -29,7 +31,7 @@ export default function LoginPage() {
         'http://localhost:5000/api/auth/login',
         data,
         {
-          withCredentials: true, 
+          withCredentials: true,
           headers: {
             'Content-Type': 'application/json',
           },
@@ -37,6 +39,7 @@ export default function LoginPage() {
       )
 
       console.log('LOGIN SUCCESS:', response.data)
+      await refreshUser()
       router.push('/Questions')
     } catch (err: any) {
       const msg = err?.response?.data?.message || 'Login failed'
@@ -52,13 +55,17 @@ export default function LoginPage() {
         <div className={styles.formGroup}>
           <label>Email:</label>
           <input type="email" {...register('email')} className={styles.input} />
-          {errors.email && <span className={styles.error} role="alert">{errors.email.message}</span>}
+          {errors.email && (
+            <span className={styles.error} role="alert">{errors.email.message}</span>
+          )}
         </div>
 
         <div className={styles.formGroup}>
           <label>Password:</label>
           <input type="password" {...register('password')} className={styles.input} />
-          {errors.password && <span className={styles.error} role="alert">{errors.password.message}</span>}
+          {errors.password && (
+            <span className={styles.error} role="alert">{errors.password.message}</span>
+          )}
         </div>
 
         <button type="submit" className={styles.button}>Sign In</button>
