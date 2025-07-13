@@ -36,8 +36,9 @@ export default function AskPage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', 
         body: JSON.stringify({
-          questionText: data.questionText,
+          question_text: data.questionText, 
         }),
       })
 
