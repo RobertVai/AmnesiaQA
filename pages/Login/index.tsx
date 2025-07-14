@@ -30,7 +30,7 @@ export default function LoginPage() {
   const onSubmit = async (data: FormData) => {
     try {
       const response = await axios.post(
-        `${baseUrl}/api/auth/login`,
+        `http://localhost:5000/api/auth/login`,
         data,
         {
           withCredentials: true,
