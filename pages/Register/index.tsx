@@ -30,7 +30,7 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const res = await axios.post(`http://localhost:5000/api/auth/register`, data, {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, data, {
         withCredentials: true,
         headers: { 'Content-Type': 'application/json' },
       })

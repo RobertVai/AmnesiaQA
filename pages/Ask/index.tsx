@@ -33,7 +33,7 @@ export default function AskPage() {
 
 const onSubmit = async (data: FormData) => {
   try {
-    const res = await fetch(`${baseUrl}/question`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/question`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
