@@ -30,15 +30,15 @@ export default function QuestionsPage() {
 
   const fetchQuestions = async () => {
     try {
-      const { data } = await api.get("/questions");
-      const { data: userData } = await api.get("/auth/me");
+      const { data } = await api.get("/api/questions");
+      const { data: userData } = await api.get("api/auth/me");
       const currentUserId = userData.user._id;
 
       const questionsWithCount = await Promise.all(
         data.map(async (q: any) => {
           let answersCount = 0;
           try {
-            const countRes = await api.get(`/question/${q._id}/answers/count`);
+            const countRes = await api.get(`/api/question/${q._id}/answers/count`);
             answersCount = countRes.data.count ?? 0;
           } catch (err) {
             console.error("Failed to get answer count for question", q._id, err);
@@ -65,7 +65,7 @@ export default function QuestionsPage() {
 
   const toggleLike = async (id: string) => {
     try {
-      const { data: updated } = await api.post(`/question/${id}/like`);
+      const { data: updated } = await api.post(`/api/question/${id}/like`);
       setQuestions((prev) =>
         prev.map((q) =>
           q._id === id
@@ -88,7 +88,7 @@ export default function QuestionsPage() {
 
   const toggleDislike = async (id: string) => {
     try {
-      const { data: updated } = await api.post(`/question/${id}/dislike`);
+      const { data: updated } = await api.post(`/api/question/${id}/dislike`);
       setQuestions((prev) =>
         prev.map((q) =>
           q._id === id
@@ -111,7 +111,7 @@ export default function QuestionsPage() {
 
   const toggleAnswerLike = async (answerId: string, questionId: string) => {
     try {
-      const { data: updated } = await api.post(`/answer/${answerId}/like`);
+      const { data: updated } = await api.post(`/api/answer/${answerId}/like`);
       setQuestions((prev) =>
         prev.map((q) =>
           q._id === questionId
@@ -141,7 +141,7 @@ export default function QuestionsPage() {
 
   const toggleAnswerDislike = async (answerId: string, questionId: string) => {
     try {
-      const { data: updated } = await api.post(`/answer/${answerId}/dislike`);
+      const { data: updated } = await api.post(`/api/answer/${answerId}/dislike`);
       setQuestions((prev) =>
         prev.map((q) =>
           q._id === questionId
@@ -172,7 +172,7 @@ export default function QuestionsPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this question?")) return;
     try {
-      await api.delete(`/question/${id}`);
+      await api.delete(`/api/question/${id}`);
       setQuestions((prev) => prev.filter((q) => q._id !== id));
     } catch (err) {
       console.error("Delete error", err);
@@ -181,7 +181,7 @@ export default function QuestionsPage() {
 
   const handleDeleteAnswer = async (answerId: string, questionId: string) => {
     try {
-      await api.delete(`/answer/${answerId}`);
+      await api.delete(`/api/answer/${answerId}`);
       setQuestions((prev) =>
         prev.map((q) =>
           q._id === questionId
@@ -203,7 +203,7 @@ export default function QuestionsPage() {
     if (q) {
       if (!q.answers.length) {
         try {
-          const { data } = await api.get(`/question/${id}/answers`);
+          const { data } = await api.get(`/api/question/${id}/answers`);
           const updatedAnswers = data.map((a: any) => ({
             ...a,
             liked: a.likedBy?.includes(user?._id),
@@ -229,7 +229,7 @@ export default function QuestionsPage() {
     if (!answer?.trim()) return;
 
     try {
-      const { data: newAnswer } = await api.post(`/question/${id}/answers`, {
+      const { data: newAnswer } = await api.post(`/api/question/${id}/answers`, {
         text: answer,
       });
       setQuestions((prev) =>
