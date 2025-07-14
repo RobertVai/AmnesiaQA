@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import styles from './Sidebar.module.css'
-import LogOut from './LogOut'
+import LogOut from '@/components/LogOut'
 
 export default function Sidebar() {
   return (

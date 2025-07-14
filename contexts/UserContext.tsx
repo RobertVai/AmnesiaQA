@@ -10,12 +10,15 @@ interface UserContextType {
   user: User | null
   setUser: (user: User | null) => void
   refreshUser: () => void
+  logout: () => void
+  loading: boolean
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true);
 
   const refreshUser = async () => {
     try {
@@ -25,6 +28,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       setUser(res.data.user)
     } catch {
       setUser(null)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -33,16 +38,16 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   const logout = () => {
-  fetch('http://localhost:5000/api/auth/logout', {
-    method: 'POST',
-    credentials: 'include',
-  })
-    .then(() => setUser(null))
-    .catch(err => console.error('Logout failed', err));
-};
+    fetch('http://localhost:5000/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
+    })
+      .then(() => setUser(null))
+      .catch(err => console.error('Logout failed', err));
+  };
 
   return (
-    <UserContext.Provider value={{ user, setUser, refreshUser, logout }}>
+    <UserContext.Provider value={{ user, setUser, refreshUser, logout, loading }}>
       {children}
     </UserContext.Provider>
   )
