@@ -6,6 +6,8 @@ import axios from 'axios'
 import styles from './register.module.css'
 import { useUser } from '@/contexts/UserContext'
 
+const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+
 const schema = z.object({
   name: z.string().min(2, 'Name is too short'),
   email: z.string().email('Invalid email'),

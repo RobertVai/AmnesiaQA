@@ -15,6 +15,8 @@ interface UserContextType {
   loading: boolean
 }
 
+const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
