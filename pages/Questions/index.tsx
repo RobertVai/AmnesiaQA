@@ -205,8 +205,8 @@ const toggleAnswerDislike = async (answerId: string, questionId: string) => {
           const { data } = await api.get(`/question/${id}/answers`);
           const updatedAnswers = data.map((a: any) => ({
             ...a,
-            liked: a.likedBy?.includes(user?.id),
-            disliked: a.dislikedBy?.includes(user?.id),
+            liked: a.likedBy?.includes(user?._id),
+            disliked: a.dislikedBy?.includes(user?._id),
           }));
           q.answers = updatedAnswers;
           q.answersCount = updatedAnswers.length;

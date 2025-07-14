@@ -2,8 +2,9 @@ import { createContext, useState, useEffect, useContext, ReactNode } from 'react
 import axios from 'axios'
 
 interface User {
-  name: string
-  email: string
+  _id: string;
+  name: string;
+  email: string;
 }
 
 interface UserContextType {
