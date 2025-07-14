@@ -25,7 +25,7 @@ export default function QuestionsPage() {
       setIsAuth(true);
       fetchQuestions();
     }
-  }, [user, loading]);
+  }, [user, loading, router]);
 
   const fetchQuestions = async () => {
     try {
