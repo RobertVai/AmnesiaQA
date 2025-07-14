@@ -23,7 +23,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const refreshUser = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/auth/me', {
+      const res = await axios.get('${baseUrl}/api/auth/me', {
         withCredentials: true,
       })
       setUser(res.data.user)
@@ -39,7 +39,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   const logout = () => {
-    fetch('http://localhost:5000/api/auth/logout', {
+    fetch('${baseUrl}/api/auth/logout', {
       method: 'POST',
       credentials: 'include',
     })
