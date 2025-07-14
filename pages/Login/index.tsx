@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import axios from 'axios'
 import styles from '../Register/register.module.css'
 import { useUser } from '@/contexts/UserContext'
+import api from '@/utils/api'
 
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -29,8 +30,8 @@ export default function LoginPage() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
+      const response = await api.post(
+        `/api/auth/login`,
         data,
         {
           withCredentials: true,
