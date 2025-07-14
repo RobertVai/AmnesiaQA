@@ -6,6 +6,8 @@ import { useEffect } from 'react'
 import { isUserAuthenticated } from '@/utils/auth'
 import styles from '../Register/register.module.css'
 
+const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+
 const schema = z.object({
   questionText: z.string().min(10, 'Question must be at least 10 characters'),
 })
@@ -31,7 +33,7 @@ export default function AskPage() {
 
 const onSubmit = async (data: FormData) => {
   try {
-    const res = await fetch('http://localhost:5000/api/question', {
+    const res = await fetch(`${baseUrl}/question`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
