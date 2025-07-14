@@ -25,7 +25,7 @@ export default function QuestionsPage() {
       setIsAuth(true);
       fetchQuestions();
     }
-    // eslint-disable-next-line
+    
   }, [user, loading]);
 
   const fetchQuestions = async () => {

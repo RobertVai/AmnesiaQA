@@ -5,8 +5,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { isUserAuthenticated } from '@/utils/auth'
 import styles from '../Register/register.module.css'
-
-const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+import api from '@/utils/api' 
 
 const schema = z.object({
   questionText: z.string().min(10, 'Question must be at least 10 characters'),
@@ -31,34 +30,25 @@ export default function AskPage() {
     resolver: zodResolver(schema),
   })
 
-const onSubmit = async (data: FormData) => {
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/question`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({
-        questionText: data.questionText, 
-      }),
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(text || 'Failed to post question');
+  const onSubmit = async (data: FormData) => {
+    try {
+      
+      await api.post('/api/question', {
+        questionText: data.questionText,
+      })
+      router.push('/Questions')
+    } catch (err: any) {
+      
+      const msg =
+        err?.response?.data?.message || err?.response?.data || err.message || 'Failed to post question'
+      console.error('❌ Submit error:', err)
+      alert(msg)
     }
-
-    router.push('/Questions');
-  } catch (err) {
-    console.error('❌ Submit error:', err);
   }
-};
 
   return (
     <div className={styles.container}>
       <h1 className={styles.heading}>Ask a Question</h1>
-
       <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
         <div className={styles.formGroup}>
           <label>Question:</label>
@@ -67,7 +57,6 @@ const onSubmit = async (data: FormData) => {
             <span className={styles.error} role="alert">{errors.questionText.message}</span>
           )}
         </div>
-
         <button type="submit" className={styles.button}>Submit Question</button>
       </form>
     </div>
