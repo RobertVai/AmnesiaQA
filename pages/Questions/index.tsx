@@ -7,6 +7,7 @@ import { Question } from "@/types/interfaces";
 import { useUser } from "@/contexts/UserContext";
 import dayjs from "dayjs";
 import api from "@/utils/api";
+import Image from "next/image";
 
 export default function QuestionsPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -301,7 +302,7 @@ const toggleAnswerDislike = async (answerId: string, questionId: string) => {
                         onClick={() => toggleLike(q._id)}
                         className={`${styles.likeBtn} ${q.liked ? styles.liked : ""}`}
                       >
-                        <img src="/icons/heart.png" alt="Like" width={20} height={20} />
+                        <Image src="/icons/heart.png" alt="Like" width={20} height={20} />
                         {q.likes}
                       </button>
 
@@ -310,7 +311,7 @@ const toggleAnswerDislike = async (answerId: string, questionId: string) => {
                         className={`${styles.likeBtn} ${q.disliked ? styles.liked : ""}`}
                         style={{ marginLeft: "12px" }}
                       >
-                        <img src="/icons/broken-heart.png" alt="Dislike" width={20} height={20} />
+                        <Image src="/icons/broken-heart.png" alt="Dislike" width={20} height={20} />
                         {q.dislikes}
                       </button>
                     </span>
@@ -346,7 +347,7 @@ const toggleAnswerDislike = async (answerId: string, questionId: string) => {
                               onClick={() => toggleAnswerLike(a._id, q._id)}
                               className={`${styles.likeBtn} ${a.liked ? styles.liked : ""}`}
                             >
-                              <img src="/icons/heart.png" alt="Like" width={20} height={20} />
+                              <Image src="/icons/heart.png" alt="Like" width={20} height={20} />
                               {a.likes}
                             </button>
 
@@ -354,7 +355,7 @@ const toggleAnswerDislike = async (answerId: string, questionId: string) => {
                               onClick={() => toggleAnswerDislike(a._id, q._id)}
                               className={`${styles.likeBtn} ${a.disliked ? styles.liked : ""}`}
                             >
-                              <img
+                              <Image
                                 src="/icons/broken-heart.png"
                                 alt="Dislike"
                                 width={20}
