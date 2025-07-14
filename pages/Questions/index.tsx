@@ -61,99 +61,111 @@ export default function QuestionsPage() {
     }
   };
 
-  const toggleLike = async (id: string) => {
-    try {
-      const { data: updated } = await api.post(`/question/${id}/like`);
-      setQuestions((prev) =>
-        prev.map((q) =>
-          q._id === id
-            ? {
-                ...q,
-                likes: updated.likes || 0,
-                likedBy: updated.likedBy || [],
-                liked: updated.likedBy.includes(updated.currentUserId),
-              }
-            : q
-        )
-      );
-    } catch (err) {
-      console.error("Error toggling like", err);
-    }
-  };
+const toggleLike = async (id: string) => {
+  try {
+    const { data: updated } = await api.post(`/question/${id}/like`);
+    setQuestions((prev) =>
+      prev.map((q) =>
+        q._id === id
+          ? {
+              ...q,
+              likes: updated.likes || 0,
+              dislikes: updated.dislikes || 0,
+              likedBy: updated.likedBy || [],
+              dislikedBy: updated.dislikedBy || [],
+              liked: updated.likedBy.includes(updated.currentUserId),
+              disliked: false, 
+            }
+          : q
+      )
+    );
+  } catch (err) {
+    console.error("Error toggling like", err);
+  }
+};
 
-  const toggleDislike = async (id: string) => {
-    try {
-      const { data: updated } = await api.post(`/question/${id}/dislike`);
-      setQuestions((prev) =>
-        prev.map((q) =>
-          q._id === id
-            ? {
-                ...q,
-                dislikes: updated.dislikes,
-                dislikedBy: updated.dislikedBy,
-                disliked: updated.dislikedBy.includes(updated.currentUserId),
-              }
-            : q
-        )
-      );
-    } catch (err) {
-      console.error("Error toggling dislike", err);
-    }
-  };
+const toggleDislike = async (id: string) => {
+  try {
+    const { data: updated } = await api.post(`/question/${id}/dislike`);
+    setQuestions((prev) =>
+      prev.map((q) =>
+        q._id === id
+          ? {
+              ...q,
+              likes: updated.likes || 0,
+              dislikes: updated.dislikes || 0,
+              likedBy: updated.likedBy || [],
+              dislikedBy: updated.dislikedBy || [],
+              disliked: updated.dislikedBy.includes(updated.currentUserId),
+              liked: false, 
+            }
+          : q
+      )
+    );
+  } catch (err) {
+    console.error("Error toggling dislike", err);
+  }
+};
 
-  const toggleAnswerLike = async (answerId: string, questionId: string) => {
-    try {
-      const { data: updated } = await api.post(`/answer/${answerId}/like`);
-      setQuestions((prev) =>
-        prev.map((q) =>
-          q._id === questionId
-            ? {
-                ...q,
-                answers: q.answers.map((a) =>
-                  a._id === answerId
-                    ? {
-                        ...a,
-                        likes: updated.likes,
-                        likedBy: updated.likedBy,
-                        liked: updated.likedBy.includes(updated.currentUserId),
-                      }
-                    : a
-                ),
-              }
-            : q
-        )
-      );
-    } catch (err) {
-      console.error("Error toggling answer like", err);
-    }
-  };
+const toggleAnswerLike = async (answerId: string, questionId: string) => {
+  try {
+    const { data: updated } = await api.post(`/answer/${answerId}/like`);
+    setQuestions((prev) =>
+      prev.map((q) =>
+        q._id === questionId
+          ? {
+              ...q,
+              answers: q.answers.map((a) =>
+                a._id === answerId
+                  ? {
+                      ...a,
+                      likes: updated.likes,
+                      dislikes: updated.dislikes,
+                      likedBy: updated.likedBy,
+                      dislikedBy: updated.dislikedBy,
+                      liked: updated.likedBy.includes(updated.currentUserId),
+                      disliked: false, 
+                    }
+                  : a
+              ),
+            }
+          : q
+      )
+    );
+  } catch (err) {
+    console.error("Error toggling answer like", err);
+  }
+};
 
-  const toggleAnswerDislike = async (answerId: string, questionId: string) => {
-    try {
-      const { data: updated } = await api.post(`/answer/${answerId}/dislike`);
-      setQuestions((prev) =>
-        prev.map((q) =>
-          q._id === questionId
-            ? {
-                ...q,
-                answers: q.answers.map((a) =>
-                  a._id === answerId
-                    ? {
-                        ...a,
-                        dislikes: updated.dislikes,
-                        dislikedBy: updated.dislikedBy,
-                        disliked: updated.dislikedBy.includes(updated.currentUserId),
-                      }
-                    : a
-                ),
-              }
-            : q
-        )
-      );
-    } catch (err) {
-      console.error("Error toggling answer dislike", err);
-    }
-  };
+const toggleAnswerDislike = async (answerId: string, questionId: string) => {
+  try {
+    const { data: updated } = await api.post(`/answer/${answerId}/dislike`);
+    setQuestions((prev) =>
+      prev.map((q) =>
+        q._id === questionId
+          ? {
+              ...q,
+              answers: q.answers.map((a) =>
+                a._id === answerId
+                  ? {
+                      ...a,
+                      likes: updated.likes,
+                      dislikes: updated.dislikes,
+                      likedBy: updated.likedBy,
+                      dislikedBy: updated.dislikedBy,
+                      disliked: updated.dislikedBy.includes(updated.currentUserId),
+                      liked: false, 
+                    }
+                  : a
+              ),
+            }
+          : q
+      )
+    );
+  } catch (err) {
+    console.error("Error toggling answer dislike", err);
+  }
+};
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this question?")) return;
@@ -287,19 +299,19 @@ export default function QuestionsPage() {
                     <span>
                       <button
                         onClick={() => toggleLike(q._id)}
-                        className={`${styles.likeBtn} ${
-                          q.liked ? styles.liked : ""
-                        }`}
+                        className={`${styles.likeBtn} ${q.liked ? styles.liked : ""}`}
                       >
-                        👍 Like {q.likes}
+                        <img src="/icons/heart.png" alt="Like" width={20} height={20} />
+                        {q.likes}
                       </button>
+
                       <button
                         onClick={() => toggleDislike(q._id)}
-                        className={`${styles.likeBtn} ${
-                          q.disliked ? styles.liked : ""
-                        }`}
+                        className={`${styles.likeBtn} ${q.disliked ? styles.liked : ""}`}
+                        style={{ marginLeft: "12px" }}
                       >
-                        👎 Dislike {q.dislikes}
+                        <img src="/icons/broken-heart.png" alt="Dislike" width={20} height={20} />
+                        {q.dislikes}
                       </button>
                     </span>
 
@@ -332,19 +344,23 @@ export default function QuestionsPage() {
                           <div className={styles.meta}>
                             <button
                               onClick={() => toggleAnswerLike(a._id, q._id)}
-                              className={`${styles.likeBtn} ${
-                                a.liked ? styles.liked : ""
-                              }`}
+                              className={`${styles.likeBtn} ${a.liked ? styles.liked : ""}`}
                             >
-                              👍 Like {a.likes}
+                              <img src="/icons/heart.png" alt="Like" width={20} height={20} />
+                              {a.likes}
                             </button>
+
                             <button
                               onClick={() => toggleAnswerDislike(a._id, q._id)}
-                              className={`${styles.likeBtn} ${
-                                a.disliked ? styles.liked : ""
-                              }`}
+                              className={`${styles.likeBtn} ${a.disliked ? styles.liked : ""}`}
                             >
-                              👎 Dislike {a.dislikes}
+                              <img
+                                src="/icons/broken-heart.png"
+                                alt="Dislike"
+                                width={20}
+                                height={20}
+                              />
+                              {a.dislikes}
                             </button>
 
                             {user?._id === a.user_id && (
