@@ -2,11 +2,9 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/router'
-import axios from 'axios'
 import styles from './register.module.css'
 import { useUser } from '@/contexts/UserContext'
-
-const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+import api from '@/utils/api' 
 
 const schema = z.object({
   name: z.string().min(2, 'Name is too short'),
@@ -30,8 +28,7 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, data, {
-        withCredentials: true,
+      const res = await api.post('/api/auth/register', data, {
         headers: { 'Content-Type': 'application/json' },
       })
 

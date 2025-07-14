@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useContext, ReactNode } from 'react'
-import axios from 'axios'
+import api from '@/utils/api';
 
 interface User {
   _id: string;
@@ -23,9 +23,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const refreshUser = async () => {
     try {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
-        withCredentials: true,
-      })
+      const res = await api.get("/api/auth/me")
       setUser(res.data.user)
     } catch {
       setUser(null)
@@ -36,16 +34,17 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     refreshUser()
+    // eslint-disable-next-line
   }, [])
 
-  const logout = () => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
-      method: 'POST',
-      credentials: 'include',
-    })
-      .then(() => setUser(null))
-      .catch(err => console.error('Logout failed', err));
-  };
+  const logout = async () => {
+    try {
+      await api.post("/api/auth/logout")
+      setUser(null)
+    } catch (err) {
+      console.error('Logout failed', err)
+    }
+  }
 
   return (
     <UserContext.Provider value={{ user, setUser, refreshUser, logout, loading }}>
