@@ -39,7 +39,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   const logout = () => {
-    fetch('http://localhost:5000/api/auth/logout', {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
       method: 'POST',
       credentials: 'include',
     })
