@@ -9,7 +9,6 @@ export default function Sidebar() {
 
       <nav className={styles.nav}>
         <Link href="/" className={styles.link}>Home</Link>
-        <Link href="#" className={styles.link}>Settings</Link>
       </nav>
 
       <div className={styles.logoutArea}>
