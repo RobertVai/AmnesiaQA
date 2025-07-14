@@ -15,8 +15,6 @@ interface UserContextType {
   loading: boolean
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
@@ -25,7 +23,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const refreshUser = async () => {
     try {
-      const res = await axios.get(`${baseUrl}/api/auth/me`, {
+      const res = await axios.get('http://localhost:5000/api/auth/me', {
         withCredentials: true,
       })
       setUser(res.data.user)
@@ -41,7 +39,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   const logout = () => {
-    fetch(`${baseUrl}/api/auth/logout`, {
+    fetch('http://localhost:5000/api/auth/logout', {
       method: 'POST',
       credentials: 'include',
     })
