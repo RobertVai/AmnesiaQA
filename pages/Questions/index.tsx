@@ -5,9 +5,8 @@ import Sidebar from "@/components/Sidebar/Sidebar";
 import styles from "./questions.module.css";
 import { Question } from "@/types/interfaces";
 import { useUser } from "@/contexts/UserContext";
-import dayjs from "dayjs";
 import api from "@/utils/api";
-import Image from "next/image";
+import QuestionCard from "@/components/QuestionCard/questioncard";
 
 export default function QuestionsPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -25,109 +24,92 @@ export default function QuestionsPage() {
       setIsAuth(true);
       fetchQuestions();
     }
-    
   }, [user, loading]);
 
   const fetchQuestions = async () => {
     try {
       const { data } = await api.get("/api/questions");
-      const { data: userData } = await api.get("api/auth/me");
+      const { data: userData } = await api.get("/api/auth/me");
       const currentUserId = userData.user._id;
 
-      const questionsWithCount = await Promise.all(
+      const enriched = await Promise.all(
         data.map(async (q: any) => {
-          let answersCount = 0;
+          let count = 0;
           try {
-            const countRes = await api.get(`/api/question/${q._id}/answers/count`);
-            answersCount = countRes.data.count ?? 0;
-          } catch (err) {
-            console.error("Failed to get answer count for question", q._id, err);
-          }
-
+            const res = await api.get(`/api/question/${q._id}/answers/count`);
+            count = res.data.count ?? 0;
+          } catch {}
           return {
             ...q,
             liked: q.likedBy?.includes(currentUserId),
             disliked: q.dislikedBy?.includes(currentUserId),
-            showAnswers: false,
             likes: q.likes || 0,
             dislikes: q.dislikes || 0,
+            showAnswers: false,
             answers: [],
-            answersCount,
+            answersCount: count,
           };
         })
       );
-
-      setQuestions(questionsWithCount);
+      setQuestions(enriched);
     } catch (err) {
-      console.error("Error fetching questions", err);
+      console.error(err);
     }
   };
 
   const toggleLike = async (id: string) => {
     try {
-      const { data: updated } = await api.post(`/api/question/${id}/like`);
+      const { data: u } = await api.post(`/api/question/${id}/like`);
       setQuestions((prev) =>
         prev.map((q) =>
           q._id === id
             ? {
                 ...q,
-                likes: updated.likes || 0,
-                dislikes: updated.dislikes || 0,
-                likedBy: updated.likedBy || [],
-                dislikedBy: updated.dislikedBy || [],
-                liked: updated.likedBy.includes(updated.currentUserId),
+                likes: u.likes || 0,
+                dislikes: u.dislikes || 0,
+                liked: u.likedBy.includes(u.currentUserId),
                 disliked: false,
               }
             : q
         )
       );
     } catch (err) {
-      console.error("Error toggling like", err);
+      console.error(err);
     }
   };
 
   const toggleDislike = async (id: string) => {
     try {
-      const { data: updated } = await api.post(`/api/question/${id}/dislike`);
+      const { data: u } = await api.post(`/api/question/${id}/dislike`);
       setQuestions((prev) =>
         prev.map((q) =>
           q._id === id
             ? {
                 ...q,
-                likes: updated.likes || 0,
-                dislikes: updated.dislikes || 0,
-                likedBy: updated.likedBy || [],
-                dislikedBy: updated.dislikedBy || [],
-                disliked: updated.dislikedBy.includes(updated.currentUserId),
+                likes: u.likes || 0,
+                dislikes: u.dislikes || 0,
+                disliked: u.dislikedBy.includes(u.currentUserId),
                 liked: false,
               }
             : q
         )
       );
     } catch (err) {
-      console.error("Error toggling dislike", err);
+      console.error(err);
     }
   };
 
-  const toggleAnswerLike = async (answerId: string, questionId: string) => {
+  const toggleAnswerLike = async (aid: string, qid: string) => {
     try {
-      const { data: updated } = await api.post(`/api/answer/${answerId}/like`);
+      const { data: u } = await api.post(`/api/answer/${aid}/like`);
       setQuestions((prev) =>
         prev.map((q) =>
-          q._id === questionId
+          q._id === qid
             ? {
                 ...q,
                 answers: q.answers.map((a) =>
-                  a._id === answerId
-                    ? {
-                        ...a,
-                        likes: updated.likes,
-                        dislikes: updated.dislikes,
-                        likedBy: updated.likedBy,
-                        dislikedBy: updated.dislikedBy,
-                        liked: updated.likedBy.includes(updated.currentUserId),
-                        disliked: false,
-                      }
+                  a._id === aid
+                    ? { ...a, likes: u.likes, dislikes: u.dislikes, liked: u.likedBy.includes(u.currentUserId), disliked: false }
                     : a
                 ),
               }
@@ -135,29 +117,21 @@ export default function QuestionsPage() {
         )
       );
     } catch (err) {
-      console.error("Error toggling answer like", err);
+      console.error(err);
     }
   };
 
-  const toggleAnswerDislike = async (answerId: string, questionId: string) => {
+  const toggleAnswerDislike = async (aid: string, qid: string) => {
     try {
-      const { data: updated } = await api.post(`/api/answer/${answerId}/dislike`);
+      const { data: u } = await api.post(`/api/answer/${aid}/dislike`);
       setQuestions((prev) =>
         prev.map((q) =>
-          q._id === questionId
+          q._id === qid
             ? {
                 ...q,
                 answers: q.answers.map((a) =>
-                  a._id === answerId
-                    ? {
-                        ...a,
-                        likes: updated.likes,
-                        dislikes: updated.dislikes,
-                        likedBy: updated.likedBy,
-                        dislikedBy: updated.dislikedBy,
-                        disliked: updated.dislikedBy.includes(updated.currentUserId),
-                        liked: false,
-                      }
+                  a._id === aid
+                    ? { ...a, likes: u.likes, dislikes: u.dislikes, disliked: u.dislikedBy.includes(u.currentUserId), liked: false }
                     : a
                 ),
               }
@@ -165,88 +139,66 @@ export default function QuestionsPage() {
         )
       );
     } catch (err) {
-      console.error("Error toggling answer dislike", err);
+      console.error(err);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this question?")) return;
+    if (!confirm("Delete question?")) return;
     try {
       await api.delete(`/api/question/${id}`);
       setQuestions((prev) => prev.filter((q) => q._id !== id));
     } catch (err) {
-      console.error("Delete error", err);
+      console.error(err);
     }
   };
 
-  const handleDeleteAnswer = async (answerId: string, questionId: string) => {
+  const handleDeleteAnswer = async (aid: string, qid: string) => {
     try {
-      await api.delete(`/api/answer/${answerId}`);
+      await api.delete(`/api/answer/${aid}`);
       setQuestions((prev) =>
         prev.map((q) =>
-          q._id === questionId
-            ? {
-                ...q,
-                answers: q.answers.filter((a) => a._id !== answerId),
-              }
+          q._id === qid
+            ? { ...q, answers: q.answers.filter((a) => a._id !== aid) }
             : q
         )
       );
     } catch (err) {
-      console.error("Delete answer error", err);
+      console.error(err);
     }
   };
 
   const toggleAnswers = async (id: string) => {
-    const updated = [...questions];
-    const q = updated.find((q) => q._id === id);
-    if (q) {
-      if (!q.answers.length) {
-        try {
-          const { data } = await api.get(`/api/question/${id}/answers`);
-          const updatedAnswers = data.map((a: any) => ({
-            ...a,
-            liked: a.likedBy?.includes(user?._id),
-            disliked: a.dislikedBy?.includes(user?._id),
-          }));
-          q.answers = updatedAnswers;
-          q.answersCount = updatedAnswers.length;
-        } catch (err) {
-          console.error("Answers load error", err);
-        }
-      }
-      q.showAnswers = !q.showAnswers;
-      setQuestions([...updated]);
+    const copy = [...questions];
+    const q = copy.find((x) => x._id === id);
+    if (!q) return;
+    if (!q.answers.length) {
+      try {
+        const { data } = await api.get(`/api/question/${id}/answers`);
+        q.answers = data.map((a: any) => ({ ...a, liked: a.likedBy.includes(user!._id), disliked: a.dislikedBy.includes(user!._id) }));
+        q.answersCount = q.answers.length;
+      } catch {}
     }
+    q.showAnswers = !q.showAnswers;
+    setQuestions(copy);
   };
 
-  const handleAnswerChange = (id: string, value: string) => {
-    setAnswerInputs({ ...answerInputs, [id]: value });
+  const handleAnswerChange = (id: string, val: string) => {
+    setAnswerInputs((p) => ({ ...p, [id]: val }));
   };
 
   const submitAnswer = async (id: string) => {
-    const answer = answerInputs[id];
-    if (!answer?.trim()) return;
-
+    const txt = answerInputs[id]?.trim();
+    if (!txt) return;
     try {
-      const { data: newAnswer } = await api.post(`/api/question/${id}/answers`, {
-        text: answer,
-      });
+      const { data: na } = await api.post(`/api/question/${id}/answers`, { text: txt });
       setQuestions((prev) =>
         prev.map((q) =>
-          q._id === id
-            ? {
-                ...q,
-                answers: [...q.answers, newAnswer],
-                answersCount: (q.answersCount || 0) + 1,
-              }
-            : q
+          q._id === id ? { ...q, answers: [...q.answers, na], answersCount: (q.answersCount || 0) + 1 } : q
         )
       );
-      setAnswerInputs((prev) => ({ ...prev, [id]: "" }));
-    } catch (err) {
-      console.error("Answer submit error", err);
-    }
+      setAnswerInputs((p) => ({ ...p, [id]: "" }));
+    } catch {}
   };
 
   return (
@@ -258,24 +210,13 @@ export default function QuestionsPage() {
 
         {isAuth && (
           <div className={styles.askWrapper}>
-            <Link href="/Ask" className={styles.askBtn}>
-              + Ask Question
-            </Link>
+            <Link href="/Ask" className={styles.askBtn}>+ Ask Question</Link>
           </div>
         )}
 
         <div className={styles.filterWrapper}>
-          <label htmlFor="filter" className={styles.filterLabel}>
-            Filter:
-          </label>
-          <select
-            id="filter"
-            value={filter}
-            onChange={(e) =>
-              setFilter(e.target.value as "all" | "answered" | "unanswered")
-            }
-            className={styles.select}
-          >
+          <label htmlFor="filter" className={styles.filterLabel}>Filter:</label>
+          <select id="filter" value={filter} onChange={(e) => setFilter(e.target.value as any)} className={styles.select}>
             <option value="all">All</option>
             <option value="answered">Answered</option>
             <option value="unanswered">Unanswered</option>
@@ -285,120 +226,24 @@ export default function QuestionsPage() {
         <div className={styles.list}>
           {user &&
             questions
-              .filter((q) => {
-                if (filter === "answered") return q.answersCount > 0;
-                if (filter === "unanswered") return q.answersCount === 0;
-                return true;
-              })
+              .filter((q) => (filter === "all" ? true : filter === "answered" ? q.answersCount > 0 : q.answersCount === 0))
               .map((q) => (
-                <div key={q._id} className={styles.card}>
-                  <p className={styles.question}>{q.questionText}</p>
-
-                  <div className={styles.meta}>
-                    <span>{q.userName}</span>
-                    <span>{dayjs(q.date).format("YYYY-MM-DD HH:mm")}</span>
-
-                    <span>
-                      <button
-                        onClick={() => toggleLike(q._id)}
-                        className={`${styles.likeBtn} ${q.liked ? styles.liked : ""}`}
-                      >
-                        <Image src="/icons/heart.png" alt="Like" width={20} height={20} />
-                        {q.likes}
-                      </button>
-
-                      <button
-                        onClick={() => toggleDislike(q._id)}
-                        className={`${styles.likeBtn} ${q.disliked ? styles.liked : ""}`}
-                        style={{ marginLeft: "12px" }}
-                      >
-                        <Image src="/icons/broken-heart.png" alt="Dislike" width={20} height={20} />
-                        {q.dislikes}
-                      </button>
-                    </span>
-
-                    {user?._id === q.user_id && (
-                      <button
-                        onClick={() => handleDelete(q._id)}
-                        className={styles.deleteBtn}
-                      >
-                        🗑️ Delete
-                      </button>
-                    )}
-
-                    <button
-                      onClick={() => toggleAnswers(q._id)}
-                      className={styles.toggleBtn}
-                    >
-                      {q.showAnswers ? "Hide" : "Show"} Answers ({q.answersCount ?? 0})
-                    </button>
-                  </div>
-
-                  {q.showAnswers && (
-                    <div className={styles.answersBlock}>
-                      {q.answers.map((a) => (
-                        <div key={a._id} className={styles.answer}>
-                          <p>{a.text}</p>
-                          <span>
-                            {a.user_name} • {dayjs(a.date).format("YYYY-MM-DD HH:mm")}
-                          </span>
-
-                          <div className={styles.meta}>
-                            <button
-                              onClick={() => toggleAnswerLike(a._id, q._id)}
-                              className={`${styles.likeBtn} ${a.liked ? styles.liked : ""}`}
-                            >
-                              <Image src="/icons/heart.png" alt="Like" width={20} height={20} />
-                              {a.likes}
-                            </button>
-
-                            <button
-                              onClick={() => toggleAnswerDislike(a._id, q._id)}
-                              className={`${styles.likeBtn} ${a.disliked ? styles.liked : ""}`}
-                            >
-                              <Image
-                                src="/icons/broken-heart.png"
-                                alt="Dislike"
-                                width={20}
-                                height={20}
-                              />
-                              {a.dislikes}
-                            </button>
-
-                            {user?._id === a.user_id && (
-                              <button
-                                className={styles.deleteBtn}
-                                onClick={() => handleDeleteAnswer(a._id, q._id)}
-                              >
-                                🗑️ Delete
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-
-                      {isAuth && (
-                        <div className={styles.form}>
-                          <textarea
-                            placeholder="Write your answer..."
-                            value={answerInputs[q._id] || ""}
-                            onChange={(e) =>
-                              handleAnswerChange(q._id, e.target.value)
-                            }
-                            rows={3}
-                            className={styles.input}
-                          />
-                          <button
-                            onClick={() => submitAnswer(q._id)}
-                            className={styles.btn}
-                          >
-                            Submit
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                <QuestionCard
+                  key={q._id}
+                  q={q}
+                  userId={user._id}
+                  isAuth={isAuth}
+                  answerInputs={answerInputs}
+                  onLike={toggleLike}
+                  onDislike={toggleDislike}
+                  onToggleAnswers={toggleAnswers}
+                  onDeleteQuestion={handleDelete}
+                  onAnswerLike={toggleAnswerLike}
+                  onAnswerDislike={toggleAnswerDislike}
+                  onDeleteAnswer={handleDeleteAnswer}
+                  onAnswerChange={handleAnswerChange}
+                  onSubmitAnswer={submitAnswer}
+                />
               ))}
         </div>
       </main>
