@@ -1,6 +1,6 @@
 import React from "react";
 import dayjs from "dayjs";
-import styles from "@/pages/Questions/questions.module.css"
+import styles from "@/pages/Questions/questions.module.css";
 import VotingButtons from "../VotingButtons/votingbuttons";
 import { Answer } from "@/types/interfaces";
 

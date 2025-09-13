@@ -45,9 +45,9 @@
 
 @keyframes neonPulse {
   from {
-    text-shadow: 0 0 5px  #00ccff, 0 0 10px  #00ccff;
+    text-shadow: 0 0 5px #00ccff, 0 0 10px #00ccff;
   }
   to {
-    text-shadow: 0 0 20px  #00ccff, 0 0 40px  #00ccff;
+    text-shadow: 0 0 20px #00ccff, 0 0 40px #00ccff;
   }
 }

@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { useRouter } from 'next/router';
-import { useUser } from '@/contexts/UserContext';
-import styles from './logout.module.css';
+import { useState } from "react";
+import { useRouter } from "next/router";
+import { useUser } from "@/contexts/UserContext";
+import styles from "./logout.module.css";
 
 export default function LogOut() {
   const [showConfirm, setShowConfirm] = useState(false);
@@ -10,12 +10,17 @@ export default function LogOut() {
 
   const handleLogout = () => {
     logout();
-    router.push('/');
+    setShowConfirm(false);
+    router.push("/");
   };
 
   return (
     <div className={styles.wrapper}>
-      <button className={styles.logout} onClick={() => setShowConfirm(true)}>
+      <button
+        type="button"
+        className={styles.logout}
+        onClick={() => setShowConfirm(true)}
+      >
         Log out
       </button>
 
@@ -24,8 +29,20 @@ export default function LogOut() {
           <div className={styles.modal}>
             <p>Are you sure you want to log out?</p>
             <div className={styles.actions}>
-              <button onClick={handleLogout} className={styles.yes}>Yes</button>
-              <button onClick={() => setShowConfirm(false)} className={styles.no}>No</button>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className={styles.yes}
+              >
+                Yes
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowConfirm(false)}
+                className={styles.no}
+              >
+                No
+              </button>
             </div>
           </div>
         </div>

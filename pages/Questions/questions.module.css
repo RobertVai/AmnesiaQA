@@ -15,7 +15,6 @@
   font-size: 2rem;
   margin-bottom: 1.5rem;
   color: #00ccff;
-  
 }
 
 .subheading {
@@ -208,18 +207,47 @@
   transition: border 0.2s;
 }
 
+.logoutWrapper {
+  display: none;
+}
+
 .select:hover,
 .select:focus {
   border-color: #00ccff;
 }
+@media (max-width: 759px) {
+  .sidebar {
+    display: none;
+  }
 
-@media (max-width: 600px) {
+  .logoutWrapper {
+    display: flex;
+    background-color: #00aacc;
+    color: black;
+    width: 80px;
+    padding: 0.2rem;
+    border-radius: 0.5rem;
+    justify-content: center;
+  }
+
+  .main {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 1rem;
+  }
+
+  .userbadge {
+    display: none;
+  }
+
   .page {
     padding: 10px;
   }
 
   .main {
-    padding: 0 10px;
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 1rem;
   }
 
   .heading {

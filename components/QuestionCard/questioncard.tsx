@@ -1,12 +1,16 @@
 import React from "react";
 import dayjs from "dayjs";
-import styles from "@/pages/Questions/questions.module.css"
+import styles from "@/pages/Questions/questions.module.css";
 import { Question, Answer } from "@/types/interfaces";
 import AnswerCard from "../AnswerCard/answercard";
 import VotingButtons from "../VotingButtons/votingbuttons";
 
 type Props = {
-  q: Question & { answers: Answer[]; answersCount: number; showAnswers: boolean };
+  q: Question & {
+    answers: Answer[];
+    answersCount: number;
+    showAnswers: boolean;
+  };
   userId: string;
   isAuth: boolean;
   answerInputs: Record<string, string>;

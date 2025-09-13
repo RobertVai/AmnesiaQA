@@ -7,12 +7,17 @@ import { Question } from "@/types/interfaces";
 import { useUser } from "@/contexts/UserContext";
 import api from "@/utils/api";
 import QuestionCard from "@/components/QuestionCard/questioncard";
+import LogOut from "@/components/LogOut";
 
 export default function QuestionsPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isAuth, setIsAuth] = useState(false);
-  const [answerInputs, setAnswerInputs] = useState<{ [key: string]: string }>({});
-  const [filter, setFilter] = useState<"all" | "answered" | "unanswered">("all");
+  const [answerInputs, setAnswerInputs] = useState<{ [key: string]: string }>(
+    {}
+  );
+  const [filter, setFilter] = useState<"all" | "answered" | "unanswered">(
+    "all"
+  );
   const router = useRouter();
   const { user, loading } = useUser();
 
@@ -109,7 +114,13 @@ export default function QuestionsPage() {
                 ...q,
                 answers: q.answers.map((a) =>
                   a._id === aid
-                    ? { ...a, likes: u.likes, dislikes: u.dislikes, liked: u.likedBy.includes(u.currentUserId), disliked: false }
+                    ? {
+                        ...a,
+                        likes: u.likes,
+                        dislikes: u.dislikes,
+                        liked: u.likedBy.includes(u.currentUserId),
+                        disliked: false,
+                      }
                     : a
                 ),
               }
@@ -131,7 +142,13 @@ export default function QuestionsPage() {
                 ...q,
                 answers: q.answers.map((a) =>
                   a._id === aid
-                    ? { ...a, likes: u.likes, dislikes: u.dislikes, disliked: u.dislikedBy.includes(u.currentUserId), liked: false }
+                    ? {
+                        ...a,
+                        likes: u.likes,
+                        dislikes: u.dislikes,
+                        disliked: u.dislikedBy.includes(u.currentUserId),
+                        liked: false,
+                      }
                     : a
                 ),
               }
@@ -175,7 +192,11 @@ export default function QuestionsPage() {
     if (!q.answers.length) {
       try {
         const { data } = await api.get(`/api/question/${id}/answers`);
-        q.answers = data.map((a: any) => ({ ...a, liked: a.likedBy.includes(user!._id), disliked: a.dislikedBy.includes(user!._id) }));
+        q.answers = data.map((a: any) => ({
+          ...a,
+          liked: a.likedBy.includes(user!._id),
+          disliked: a.dislikedBy.includes(user!._id),
+        }));
         q.answersCount = q.answers.length;
       } catch {}
     }
@@ -191,10 +212,18 @@ export default function QuestionsPage() {
     const txt = answerInputs[id]?.trim();
     if (!txt) return;
     try {
-      const { data: na } = await api.post(`/api/question/${id}/answers`, { text: txt });
+      const { data: na } = await api.post(`/api/question/${id}/answers`, {
+        text: txt,
+      });
       setQuestions((prev) =>
         prev.map((q) =>
-          q._id === id ? { ...q, answers: [...q.answers, na], answersCount: (q.answersCount || 0) + 1 } : q
+          q._id === id
+            ? {
+                ...q,
+                answers: [...q.answers, na],
+                answersCount: (q.answersCount || 0) + 1,
+              }
+            : q
         )
       );
       setAnswerInputs((p) => ({ ...p, [id]: "" }));
@@ -203,20 +232,34 @@ export default function QuestionsPage() {
 
   return (
     <div className={styles.page}>
-      <Sidebar />
+      <div className={styles.sidebar}>
+        <Sidebar />
+      </div>
       <main className={styles.main}>
+        <div className={styles.logoutWrapper}>
+          <LogOut />
+        </div>
         <h1 className={styles.heading}>What’s on your mind?</h1>
         <p className={styles.subheading}>Browse questions or ask your own</p>
 
         {isAuth && (
           <div className={styles.askWrapper}>
-            <Link href="/Ask" className={styles.askBtn}>+ Ask Question</Link>
+            <Link href="/Ask" className={styles.askBtn}>
+              + Ask Question
+            </Link>
           </div>
         )}
 
         <div className={styles.filterWrapper}>
-          <label htmlFor="filter" className={styles.filterLabel}>Filter:</label>
-          <select id="filter" value={filter} onChange={(e) => setFilter(e.target.value as any)} className={styles.select}>
+          <label htmlFor="filter" className={styles.filterLabel}>
+            Filter:
+          </label>
+          <select
+            id="filter"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value as any)}
+            className={styles.select}
+          >
             <option value="all">All</option>
             <option value="answered">Answered</option>
             <option value="unanswered">Unanswered</option>
@@ -226,7 +269,13 @@ export default function QuestionsPage() {
         <div className={styles.list}>
           {user &&
             questions
-              .filter((q) => (filter === "all" ? true : filter === "answered" ? q.answersCount > 0 : q.answersCount === 0))
+              .filter((q) =>
+                filter === "all"
+                  ? true
+                  : filter === "answered"
+                  ? q.answersCount > 0
+                  : q.answersCount === 0
+              )
               .map((q) => (
                 <QuestionCard
                   key={q._id}
